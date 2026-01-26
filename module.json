@@ -45,5 +45,6 @@
   ],
   "socket": true,
   "url": "https://github.com/AshOfCreativity/Lancer-Downtime-Foundry-Module",
-  "manifest": "https://raw.githubusercontent.com/AshOfCreativity/Lancer-Downtime-Foundry-Module/main/module.json"
+  "manifest": "https://raw.githubusercontent.com/AshOfCreativity/Lancer-Downtime-Foundry-Module/main/module.json",
+  "download": "https://github.com/AshOfCreativity/Lancer-Downtime-Foundry-Module/archive/refs/heads/main.zip"
 }
