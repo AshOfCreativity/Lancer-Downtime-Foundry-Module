@@ -23,7 +23,7 @@ export class DowntimeTrackerApp extends Application {
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      id: "lancer-downtime-tracker",
+      id: "Lancer-Downtime-Foundry-Module-main",
       title: game.i18n?.localize("DOWNTIME.Title") || "Downtime Tracker",
       template: `modules/${MODULE_ID}/templates/downtime-app.hbs`,
       classes: ["lancer", "downtime-tracker-app"],

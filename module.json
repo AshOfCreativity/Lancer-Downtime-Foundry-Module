@@ -1,5 +1,5 @@
 {
-  "id": "lancer-downtime-tracker",
+  "id": "Lancer-Downtime-Foundry-Module-main",
   "title": "LANCER Downtime Tracker",
   "description": "A standalone downtime activity tracker for LANCER, supporting Core, Far Field, and custom action sets via LCP import.",
   "version": "1.0.0",

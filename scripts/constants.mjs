@@ -2,7 +2,7 @@
  * Module constants
  */
 
-export const MODULE_ID = "lancer-downtime-tracker";
+export const MODULE_ID = "Lancer-Downtime-Foundry-Module-main";
 
 export const SETTINGS = {
   customActionSets: "customActionSets",
