@@ -97,7 +97,7 @@ export function getAvailableCharacters() {
     img: a.img,
     actor: a,
     downtimeData: getCharacterDowntimeData(a),
-    hasFarFieldData: !!a.getFlag("lancer-far-field", "character")
+    hasFarFieldData: !!a.getFlag("Far-Field-Foundry-Module-main", "character")
   }));
 }
 

@@ -24,7 +24,7 @@
     ],
     "optional": [
       {
-        "id": "lancer-far-field",
+        "id": "Far-Field-Foundry-Module-main",
         "type": "module",
         "reason": "Enhanced integration with Far Field character data and vessel bonuses"
       }

@@ -116,7 +116,7 @@ class BaseCharacterAdapter {
 class FarFieldCharacterAdapter extends BaseCharacterAdapter {
 
   get characterData() {
-    return this.actor.getFlag("lancer-far-field", "character") || {};
+    return this.actor.getFlag("Far-Field-Foundry-Module-main", "character") || {};
   }
 
   getAspects() {
@@ -144,7 +144,7 @@ class FarFieldCharacterAdapter extends BaseCharacterAdapter {
         aspect.marked = Math.max(aspect.burned || 0, aspect.marked - count);
       }
 
-      await this.actor.setFlag("lancer-far-field", "character", {
+      await this.actor.setFlag("Far-Field-Foundry-Module-main", "character", {
         ...charData,
         aspects
       });
@@ -160,7 +160,7 @@ class FarFieldCharacterAdapter extends BaseCharacterAdapter {
       aspect.burned = Math.max(0, aspect.burned - count);
       aspect.marked = Math.max(aspect.marked, aspect.burned);
 
-      await this.actor.setFlag("lancer-far-field", "character", {
+      await this.actor.setFlag("Far-Field-Foundry-Module-main", "character", {
         ...charData,
         aspects
       });
@@ -179,7 +179,7 @@ class FarFieldCharacterAdapter extends BaseCharacterAdapter {
         resource.marked = Math.max(resource.burned || 0, resource.marked - count);
       }
 
-      await this.actor.setFlag("lancer-far-field", "character", {
+      await this.actor.setFlag("Far-Field-Foundry-Module-main", "character", {
         ...charData,
         resources
       });
@@ -190,7 +190,7 @@ class FarFieldCharacterAdapter extends BaseCharacterAdapter {
     const charData = this.characterData;
     const burdens = (charData.burdens || []).filter(b => b.id !== burdenId);
 
-    await this.actor.setFlag("lancer-far-field", "character", {
+    await this.actor.setFlag("Far-Field-Foundry-Module-main", "character", {
       ...charData,
       burdens
     });
@@ -209,7 +209,7 @@ class FarFieldCharacterAdapter extends BaseCharacterAdapter {
       burned: 0
     });
 
-    await this.actor.setFlag("lancer-far-field", "character", {
+    await this.actor.setFlag("Far-Field-Foundry-Module-main", "character", {
       ...charData,
       resources
     });
@@ -258,7 +258,7 @@ class GenericActorAdapter extends BaseCharacterAdapter {
  */
 export function getCharacterAdapter(actor) {
   // Check for Far Field character data
-  const farFieldChar = actor.getFlag("lancer-far-field", "character");
+  const farFieldChar = actor.getFlag("Far-Field-Foundry-Module-main", "character");
   if (farFieldChar) {
     return new FarFieldCharacterAdapter(actor);
   }
