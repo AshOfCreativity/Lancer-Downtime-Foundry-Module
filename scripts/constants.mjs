@@ -9,6 +9,12 @@ export const SETTINGS = {
   activeActionSets: "activeActionSets"
 };
 
+export const PHASES = {
+  TRANSIT: "transit",
+  BETWEEN_MISSIONS: "between-missions",
+  SHORE_LEAVE: "shore-leave"
+};
+
 export const CATEGORIES = {
   REST: "rest",
   MAINTENANCE: "maintenance",
