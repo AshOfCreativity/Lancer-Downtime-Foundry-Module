@@ -1,0 +1,196 @@
+{
+  "DOWNTIME": {
+    "Title": "Downtime Tracker",
+    "Tabs": {
+      "Session": "Session",
+      "Actions": "Actions",
+      "History": "History",
+      "Settings": "Settings"
+    },
+    "Session": {
+      "Title": "Current Session",
+      "Name": "Session Name",
+      "Phase": "Phase",
+      "ActionSet": "Action Set",
+      "Status": "Status",
+      "Participants": "Participants",
+      "NoActive": "No active downtime session",
+      "NoSession": "No active session",
+      "Start": "Start New Session",
+      "StartNew": "Start New Session",
+      "Configure": "Configure Session",
+      "End": "End Session",
+      "EndSession": "End Session",
+      "Pause": "Pause Session",
+      "Resume": "Resume Session",
+      "PauseSession": "Pause Session",
+      "ResumeSession": "Resume Session",
+      "RecentSessions": "Recent Sessions",
+      "AddParticipant": "Add to Session",
+      "RemoveParticipant": "Remove from Session"
+    },
+    "Phases": {
+      "transit": "Transit",
+      "between-missions": "Between Missions",
+      "shore-leave": "Shore Leave"
+    },
+    "Status": {
+      "active": "Active",
+      "paused": "Paused",
+      "completed": "Completed",
+      "inactive": "Inactive"
+    },
+    "Characters": {
+      "Title": "Characters",
+      "AddCharacter": "Add Character",
+      "RemoveCharacter": "Remove",
+      "ActionsRemaining": "Actions Remaining",
+      "ActionsUsed": "Actions Used",
+      "Unlimited": "Unlimited",
+      "NotParticipating": "Not Participating",
+      "SelectAll": "Select All",
+      "SelectNone": "Select None",
+      "None": "No characters available"
+    },
+    "Actions": {
+      "Title": "Available Actions",
+      "Available": "Available Actions",
+      "Execute": "Execute",
+      "ExecuteFor": "Execute for Selected Character",
+      "NoActions": "No actions available",
+      "None": "No actions match the current filters",
+      "SelectAction": "Select an action",
+      "SelectCharacter": "Select a character to see available actions",
+      "NoSession": "Start a session to see available actions",
+      "Phases": "Available during",
+      "RequiresRoll": "Requires Roll",
+      "Categories": {
+        "all": "All",
+        "rest": "Rest",
+        "maintenance": "Maintenance",
+        "development": "Development",
+        "social": "Social",
+        "logistics": "Logistics",
+        "personal": "Personal",
+        "acquisition": "Acquisition"
+      }
+    },
+    "History": {
+      "Title": "Action History",
+      "Timeline": "Activity Timeline",
+      "NoHistory": "No history recorded",
+      "None": "No actions recorded yet",
+      "Session": "Session",
+      "Action": "Action",
+      "Result": "Result",
+      "Timestamp": "Time",
+      "Success": "Success",
+      "Failure": "Failure",
+      "GMNotes": "GM Notes",
+      "ClearHistory": "Clear History",
+      "ExportHistory": "Export History",
+      "SelectCharacter": "Select a character to view their history"
+    },
+    "Results": {
+      "Triumph": "Triumph",
+      "Success": "Success",
+      "Conflict": "Conflict",
+      "Disaster": "Disaster"
+    },
+    "Projects": {
+      "Title": "Personal Projects",
+      "AddProject": "Add Project",
+      "RemoveProject": "Remove",
+      "Progress": "Progress",
+      "Notes": "Notes",
+      "NoProjects": "No active projects"
+    },
+    "Settings": {
+      "Title": "Settings",
+      "ActionSets": "Action Sets",
+      "ImportLCP": "Import from LCP",
+      "ManageSets": "Manage Action Sets",
+      "EnabledSets": "Enabled Action Sets",
+      "DefaultSet": "Default Action Set"
+    },
+    "Dialogs": {
+      "NewSession": {
+        "Title": "Start New Session",
+        "NameLabel": "Session Name",
+        "NamePlaceholder": "e.g., Shore Leave at Cradle",
+        "PhaseLabel": "Downtime Phase",
+        "ActionSetsLabel": "Action Sets to Use",
+        "Start": "Start Session",
+        "Cancel": "Cancel"
+      },
+      "ExecuteAction": {
+        "Title": "Execute Action",
+        "Character": "Character",
+        "Action": "Action",
+        "Description": "Description",
+        "Roll": "Roll Required",
+        "RollResult": "Roll Result",
+        "ResultDescription": "What happened?",
+        "Execute": "Execute",
+        "Cancel": "Cancel"
+      },
+      "ImportLCP": {
+        "Title": "Import Downtime Actions from LCP",
+        "SelectFile": "Select LCP File",
+        "Import": "Import",
+        "Cancel": "Cancel",
+        "Success": "Successfully imported {count} actions",
+        "Error": "Failed to import: {error}",
+        "Hint": "LCP file must contain a downtime_actions.json file with action definitions.",
+        "FormatHelp": "Click to see format requirements"
+      },
+      "RemoveActionSet": {
+        "Title": "Remove Action Set",
+        "Content": "Are you sure you want to remove this action set? This cannot be undone."
+      },
+      "Action": {
+        "RollResult": "Roll Result",
+        "SelectResult": "Select roll result...",
+        "Notes": "Notes",
+        "NotesPlaceholder": "What happened during this action?",
+        "GMNotes": "GM Notes (hidden from players)",
+        "GMNotesPlaceholder": "Notes only visible to the GM...",
+        "Effects": "Effects"
+      },
+      "Session": {
+        "Name": "Session Name",
+        "NamePlaceholder": "e.g., Shore Leave at Cradle",
+        "Phase": "Downtime Phase",
+        "ActionSets": "Action Sets",
+        "Constraints": "Constraints",
+        "MaxActions": "Max Actions per Character",
+        "Unlimited": "Unlimited",
+        "MaxActionsHint": "Leave empty for unlimited actions",
+        "AllowedCategories": "Allowed Categories",
+        "CategoriesHint": "Uncheck categories to restrict them"
+      },
+      "ConfigureSession": {
+        "Title": "Configure Session",
+        "MaxActions": "Max Actions per Character",
+        "MaxActionsHint": "Leave empty for unlimited",
+        "AllowedCategories": "Allowed Action Categories",
+        "AllCategoriesHint": "Leave all unchecked to allow all",
+        "Save": "Save",
+        "Cancel": "Cancel"
+      }
+    },
+    "Notifications": {
+      "SessionStarted": "Downtime session started: {name}",
+      "SessionEnded": "Downtime session ended",
+      "ActionExecuted": "{character} executed {action}",
+      "NoCharacterSelected": "Please select a character first",
+      "NoActionSelected": "Please select an action first",
+      "MaxActionsReached": "{character} has used all available actions",
+      "ActionNotAllowed": "This action is not allowed in the current session",
+      "ActionSetRemoved": "Action set removed"
+    },
+    "Categories": {
+      "All": "All"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "lancer-downtime-tracker",
+  "title": "LANCER Downtime Tracker",
+  "description": "A standalone downtime activity tracker for LANCER, supporting Core, Far Field, and custom action sets via LCP import.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "12"
+  },
+  "authors": [
+    {
+      "name": "Far Field Team"
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "lancer",
+        "type": "system",
+        "compatibility": {
+          "minimum": "2.0.0"
+        }
+      }
+    ],
+    "optional": [
+      {
+        "id": "lancer-far-field",
+        "type": "module",
+        "reason": "Enhanced integration with Far Field character data and vessel bonuses"
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/downtime-tracker.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "socket": true,
+  "flags": {}
+}
