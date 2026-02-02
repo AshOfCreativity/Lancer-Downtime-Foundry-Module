@@ -2,9 +2,17 @@
  * LANCER Downtime Tracker - Main Entry Point
  */
 
-import { MODULE_ID, SETTINGS, getDefaultCharacterDowntimeData } from "./constants.mjs";
+import { MODULE_ID, SETTINGS, getDefaultCharacterDowntimeData, createMarker } from "./constants.mjs";
 import { DowntimeTrackerApp } from "./DowntimeTrackerApp.mjs";
 import { getBuiltInActionSets } from "./downtime-actions.mjs";
+import {
+  showRollDialog,
+  executePilotCheck,
+  executeDicePool,
+  postRollToChat,
+  ROLL_TYPES,
+  CONDITIONAL_STATUS
+} from "./roll-handler.mjs";
 
 let downtimeApp = null;
 
@@ -30,6 +38,26 @@ function registerSettings() {
     config: false,
     type: Array,
     default: ["lancer-core", "far-field"]
+  });
+
+  // Markers list
+  game.settings.register(MODULE_ID, SETTINGS.markers, {
+    name: "Markers",
+    hint: "Downtime period markers",
+    scope: "world",
+    config: false,
+    type: Array,
+    default: []
+  });
+
+  // Active marker ID
+  game.settings.register(MODULE_ID, SETTINGS.activeMarkerId, {
+    name: "Active Marker ID",
+    hint: "Currently active marker",
+    scope: "world",
+    config: false,
+    type: String,
+    default: null
   });
 }
 
@@ -86,6 +114,42 @@ export function getAllActionSets() {
 }
 
 /**
+ * Get all markers
+ */
+export function getMarkers() {
+  return game.settings.get(MODULE_ID, SETTINGS.markers) || [];
+}
+
+/**
+ * Get the active marker
+ */
+export function getActiveMarker() {
+  const activeId = game.settings.get(MODULE_ID, SETTINGS.activeMarkerId);
+  if (!activeId) return null;
+  const markers = getMarkers();
+  return markers.find(m => m.id === activeId) || null;
+}
+
+/**
+ * Add a new marker and set it as active
+ */
+export async function addMarker(title, description, downtimeAllowed, restrictions) {
+  const marker = createMarker(title, description, downtimeAllowed, restrictions);
+  const markers = getMarkers();
+  markers.push(marker);
+  await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
+  await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, marker.id);
+  return marker;
+}
+
+/**
+ * Set the active marker by ID
+ */
+export async function setActiveMarker(markerId) {
+  await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, markerId);
+}
+
+/**
  * Get available pilots/characters
  */
 export function getAvailableCharacters() {
@@ -111,7 +175,21 @@ Hooks.once("init", () => {
     getCharacterDowntimeData,
     updateCharacterDowntimeData,
     getAllActionSets,
-    getAvailableCharacters
+    getAvailableCharacters,
+    // Marker functions
+    getMarkers,
+    getActiveMarker,
+    addMarker,
+    setActiveMarker,
+    // Roll functions for external use
+    roll: {
+      showDialog: showRollDialog,
+      pilotCheck: executePilotCheck,
+      dicePool: executeDicePool,
+      postToChat: postRollToChat,
+      TYPES: ROLL_TYPES,
+      CONDITIONAL_STATUS
+    }
   };
 });
 

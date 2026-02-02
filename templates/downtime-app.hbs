@@ -4,6 +4,33 @@
     <h1><i class="fas fa-moon"></i> {{localize "DOWNTIME.Title"}}</h1>
   </header>
 
+  {{!-- Marker Bar --}}
+  <div class="marker-bar">
+    {{#if activeMarker}}
+      <div class="active-marker {{#unless activeMarker.downtimeAllowed}}downtime-disabled{{/unless}}">
+        <span class="marker-title"><i class="fas fa-bookmark"></i> {{activeMarker.title}}</span>
+        {{#if activeMarker.description}}
+          <span class="marker-description">{{activeMarker.description}}</span>
+        {{/if}}
+        {{#unless activeMarker.downtimeAllowed}}
+          <span class="marker-status"><i class="fas fa-ban"></i> Downtime not available</span>
+        {{/unless}}
+        {{#if activeMarker.restrictions}}
+          <span class="marker-restrictions"><i class="fas fa-exclamation-triangle"></i> {{activeMarker.restrictions}}</span>
+        {{/if}}
+      </div>
+    {{else}}
+      <div class="no-marker">
+        <span>No active marker</span>
+      </div>
+    {{/if}}
+    {{#if isGM}}
+      <button type="button" class="create-marker" title="Create new marker">
+        <i class="fas fa-plus"></i> New Marker
+      </button>
+    {{/if}}
+  </div>
+
   {{!-- Main Content --}}
   <div class="downtime-content">
     {{!-- Left Panel: Characters --}}
@@ -44,22 +71,29 @@
 
         {{!-- Actions List --}}
         <div class="actions-list">
-          {{#each availableActions}}
-            <div class="action-card" data-action-id="{{this.id}}">
-              <div class="action-header">
-                <h3 class="action-name">{{this.name}}</h3>
-                {{#if this.category}}
-                  <span class="action-category">{{this.category}}</span>
-                {{/if}}
-              </div>
-              <p class="action-description">{{this.description}}</p>
-              <div class="action-footer">
-                {{#if this.requiresRoll}}
-                  <span class="requires-roll"><i class="fas fa-dice"></i> Roll</span>
-                {{/if}}
-                <button type="button" class="execute-action" data-action-id="{{this.id}}">
-                  Execute
-                </button>
+          {{#each actionSets}}
+            <div class="action-set" data-set-id="{{this.id}}">
+              <h3 class="action-set-header">{{this.name}}</h3>
+              <div class="action-set-actions">
+                {{#each this.actions}}
+                  <div class="action-card" data-action-id="{{this.id}}">
+                    <div class="action-header">
+                      <h4 class="action-name">{{this.name}}</h4>
+                      {{#if this.category}}
+                        <span class="action-category">{{this.category}}</span>
+                      {{/if}}
+                    </div>
+                    <p class="action-description">{{this.description}}</p>
+                    <div class="action-footer">
+                      {{#if this.requiresRoll}}
+                        <span class="requires-roll"><i class="fas fa-dice"></i> Roll</span>
+                      {{/if}}
+                      <button type="button" class="execute-action" data-action-id="{{this.id}}">
+                        Execute
+                      </button>
+                    </div>
+                  </div>
+                {{/each}}
               </div>
             </div>
           {{else}}

@@ -188,45 +188,6 @@ export const FAR_FIELD_ACTIONS = {
         { type: "gainResource", resourceType: "equipment" }
       ]
     },
-    {
-      id: "repair_equipment",
-      name: "Repair Equipment",
-      description: "Fix damaged gear and replenish consumables. Clear marks from Equipment and Consumable type Resources and Aspects.",
-      category: CATEGORIES.MAINTENANCE,
-      phases: [PHASES.TRANSIT, PHASES.BETWEEN_MISSIONS, PHASES.SHORE_LEAVE],
-      requiresRoll: false,
-      effects: [
-        { type: "clearMarks", target: "resources", filter: "equipment" },
-        { type: "clearMarks", target: "resources", filter: "consumable" }
-      ]
-    },
-    {
-      id: "personal_project",
-      name: "Personal Project",
-      description: "Work on a long-term personal goal. Progress a project track by 1 (or more on exceptional success). Projects can represent research, relationships, or personal goals.",
-      category: CATEGORIES.DEVELOPMENT,
-      phases: [PHASES.TRANSIT, PHASES.BETWEEN_MISSIONS, PHASES.SHORE_LEAVE],
-      requiresRoll: true,
-      rollType: "skill",
-      effects: [
-        { type: "progressProject" }
-      ],
-      requiresInput: {
-        projectName: { type: "select", label: "Project", source: "projects" }
-      }
-    },
-    {
-      id: "training",
-      name: "Training",
-      description: "Practice skills or learn from crewmates. Work toward improving your capabilities for future missions.",
-      category: CATEGORIES.DEVELOPMENT,
-      phases: [PHASES.TRANSIT, PHASES.BETWEEN_MISSIONS],
-      requiresRoll: true,
-      rollType: "skill",
-      effects: [
-        { type: "progressSkill" }
-      ]
-    }
   ]
 };
 

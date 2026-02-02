@@ -97,6 +97,45 @@
       "Conflict": "Conflict",
       "Disaster": "Disaster"
     },
+    "Roll": {
+      "Title": "Roll",
+      "PilotCheck": "Pilot Check",
+      "DicePool": "Dice Pool",
+      "Accuracy": "Accuracy",
+      "AccuracyHint": "Each accuracy adds a d6; highest is added to roll",
+      "Difficulty": "Difficulty",
+      "DifficultyHint": "Each difficulty adds a d6; lowest is subtracted from roll",
+      "PoolSize": "Dice Pool",
+      "PoolSizeHint": "Base pool from relevant skill/aspect",
+      "BonusDice": "Additional Dice",
+      "BonusDiceHint": "From resources, help, circumstances, etc.",
+      "Reason": "Reason for modifiers (optional)",
+      "ReasonPlaceholder": "e.g., Helped by contact, using a resource...",
+      "Preview": "Roll",
+      "Confirmed": "Confirmed",
+      "IfApproved": "If approved",
+      "SuccessThreshold": "5-6 = Success",
+      "Execute": "Roll",
+      "Cancel": "Cancel",
+      "PostRoll": {
+        "Title": "Result",
+        "NotesLabel": "What happened? (optional)",
+        "NotesPlaceholder": "Describe the outcome...",
+        "Save": "Save",
+        "Skip": "Skip"
+      },
+      "Conditionals": {
+        "Title": "Conditional Modifiers",
+        "Hint": "(need GM approval)",
+        "AddButton": "Add conditional modifier",
+        "Description": "Add bonuses you might get - GM will decide if they apply after seeing the roll.",
+        "PilotPlaceholder": "e.g., \"My contact might help\" or \"If the weather clears\"",
+        "PoolPlaceholder": "e.g., \"If I can use my Insight resource\" or \"Crew might assist\"",
+        "PendingApproval": "Pending GM Approval",
+        "WouldChange": "would change result",
+        "SameResult": "same result"
+      }
+    },
     "Projects": {
       "Title": "Personal Projects",
       "AddProject": "Add Project",

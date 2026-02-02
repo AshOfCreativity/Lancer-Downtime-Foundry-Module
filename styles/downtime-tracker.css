@@ -26,6 +26,79 @@
   margin-right: 0.5rem;
 }
 
+/* Marker Bar */
+.marker-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: #0f3460;
+  border-bottom: 1px solid #333;
+}
+
+.active-marker {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.active-marker.downtime-disabled {
+  opacity: 0.7;
+}
+
+.marker-title {
+  font-weight: bold;
+  color: #fff;
+}
+
+.marker-title i {
+  color: #ffd700;
+  margin-right: 0.3rem;
+}
+
+.marker-description {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.marker-status {
+  color: #e94560;
+  font-size: 0.85rem;
+}
+
+.marker-status i {
+  margin-right: 0.25rem;
+}
+
+.marker-restrictions {
+  color: #ff9800;
+  font-size: 0.85rem;
+}
+
+.marker-restrictions i {
+  margin-right: 0.25rem;
+}
+
+.no-marker {
+  color: #666;
+  font-style: italic;
+}
+
+.create-marker {
+  padding: 0.4rem 0.75rem;
+  background: #533483;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.create-marker:hover {
+  background: #6a4c9c;
+}
+
 /* Content Area - 3 Column Layout */
 .downtime-content {
   display: flex;
@@ -148,7 +221,40 @@
 .actions-list {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+/* Action Set Grouping */
+.action-set {
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.action-set-header {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  border-bottom: 2px solid #533483;
+  font-size: 0.9rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.action-set[data-set-id="far-field"] .action-set-header {
+  border-bottom-color: #1db954;
+}
+
+.action-set[data-set-id="lancer-core"] .action-set-header {
+  border-bottom-color: #e94560;
+}
+
+.action-set-actions {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  padding: 0.5rem;
 }
 
 .action-card {

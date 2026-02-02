@@ -6,7 +6,9 @@ export const MODULE_ID = "Lancer-Downtime-Foundry-Module-main";
 
 export const SETTINGS = {
   customActionSets: "customActionSets",
-  activeActionSets: "activeActionSets"
+  activeActionSets: "activeActionSets",
+  markers: "markers",
+  activeMarkerId: "activeMarkerId"
 };
 
 export const PHASES = {
@@ -42,16 +44,33 @@ export function getDefaultCharacterDowntimeData() {
 /**
  * Create a history entry
  */
-export function createHistoryEntry(sessionId, action, result) {
+export function createHistoryEntry(sessionId, action, result, markerId = null) {
   return {
     id: foundry.utils.randomID(),
     actionId: action.id,
     actionName: action.name,
+    actionSetId: action.actionSetId || null,
+    markerId: markerId,
     timestamp: new Date().toISOString(),
     result: {
       success: result.success ?? true,
       rollResult: result.rollResult ?? null,
-      description: result.description || ""
+      description: result.description || "",
+      rollData: result.rollData || null
     }
+  };
+}
+
+/**
+ * Create a marker entry
+ */
+export function createMarker(title, description, downtimeAllowed, restrictions) {
+  return {
+    id: foundry.utils.randomID(),
+    title: title,
+    description: description,
+    downtimeAllowed: downtimeAllowed,
+    restrictions: restrictions,
+    timestamp: new Date().toISOString()
   };
 }
