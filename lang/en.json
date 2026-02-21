@@ -230,6 +230,53 @@
     },
     "Categories": {
       "All": "All"
+    },
+    "Timeline": {
+      "Title": "Timeline",
+      "NoMarkers": "No markers created yet",
+      "DowntimeNotAvailable": "Downtime not available",
+      "DragToReorder": "Drag to reorder markers"
+    },
+    "Markers": {
+      "NewMarker": "New Marker",
+      "CreateNew": "Create new marker",
+      "Edit": "Edit marker",
+      "Delete": "Delete marker",
+      "Save": "Save",
+      "Cancel": "Cancel",
+      "EditTitle": "Edit Marker",
+      "DeleteTitle": "Delete Marker",
+      "DeleteConfirm": "Are you sure you want to delete marker",
+      "TitleLabel": "Title",
+      "DescriptionLabel": "Description",
+      "DowntimeAllowed": "Downtime actions allowed",
+      "RestrictionsLabel": "Restrictions",
+      "Updated": "Marker updated",
+      "Deleted": "Marker deleted"
+    },
+    "Journal": {
+      "Sync": "Journal Sync",
+      "SyncButton": "Sync downtime data to journal",
+      "SyncTitle": "Journal Sync Configuration",
+      "SyncNow": "Sync Now",
+      "SyncComplete": "Downtime data synced to journal",
+      "SaveConfig": "Save Config",
+      "ConfigSaved": "Journal sync config saved",
+      "Cancel": "Cancel",
+      "SelectJournal": "Target Journal",
+      "SelectPrompt": "-- Select a journal --",
+      "NewJournal": "New",
+      "DefaultName": "Downtime Log",
+      "Created": "Journal created",
+      "PageName": "Downtime Log",
+      "NoJournalSelected": "No journal selected for sync",
+      "JournalNotFound": "Selected journal not found",
+      "DataToInclude": "Data to include",
+      "IncludeMarkerSummaries": "Marker summaries",
+      "IncludeActionHistory": "Action history",
+      "IncludeRollResults": "Roll details",
+      "FilterByMarker": "Filter by marker",
+      "FilterHint": "Uncheck markers to exclude their data from the sync"
     }
   }
 }

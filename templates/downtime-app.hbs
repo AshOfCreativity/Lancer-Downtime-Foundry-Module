@@ -4,30 +4,59 @@
     <h1><i class="fas fa-moon"></i> {{localize "DOWNTIME.Title"}}</h1>
   </header>
 
-  {{!-- Marker Bar --}}
-  <div class="marker-bar">
+  {{!-- Timeline --}}
+  <div class="timeline-container">
+    <div class="timeline-header">
+      <span class="timeline-label"><i class="fas fa-stream"></i> {{localize "DOWNTIME.Timeline.Title"}}</span>
+      {{#if isGM}}
+        <div class="timeline-controls">
+          <button type="button" class="journal-sync-btn" title="{{localize "DOWNTIME.Journal.SyncButton"}}">
+            <i class="fas fa-book"></i> {{localize "DOWNTIME.Journal.Sync"}}
+          </button>
+          <button type="button" class="create-marker" title="{{localize "DOWNTIME.Markers.CreateNew"}}">
+            <i class="fas fa-plus"></i> {{localize "DOWNTIME.Markers.NewMarker"}}
+          </button>
+        </div>
+      {{/if}}
+    </div>
+    <div class="timeline-rail-wrapper">
+      <div class="timeline-rail">
+        <div class="timeline-line"></div>
+        {{#each timelineMarkers}}
+          <div class="timeline-node {{#if this.isActive}}active{{/if}} {{#unless this.downtimeAllowed}}disabled{{/unless}}"
+               data-marker-id="{{this.id}}"
+               {{#if ../isGM}}draggable="true"{{/if}}>
+            <div class="node-dot"></div>
+            <div class="node-label">{{this.title}}</div>
+            {{#if ../isGM}}
+              <div class="node-actions">
+                <button type="button" class="edit-marker" data-marker-id="{{this.id}}" title="{{localize "DOWNTIME.Markers.Edit"}}">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="delete-marker" data-marker-id="{{this.id}}" title="{{localize "DOWNTIME.Markers.Delete"}}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            {{/if}}
+          </div>
+        {{else}}
+          <div class="timeline-empty">{{localize "DOWNTIME.Timeline.NoMarkers"}}</div>
+        {{/each}}
+      </div>
+    </div>
     {{#if activeMarker}}
-      <div class="active-marker {{#unless activeMarker.downtimeAllowed}}downtime-disabled{{/unless}}">
-        <span class="marker-title"><i class="fas fa-bookmark"></i> {{activeMarker.title}}</span>
+      <div class="active-marker-detail {{#unless activeMarker.downtimeAllowed}}downtime-disabled{{/unless}}">
+        <span class="detail-title"><i class="fas fa-bookmark"></i> {{activeMarker.title}}</span>
         {{#if activeMarker.description}}
-          <span class="marker-description">{{activeMarker.description}}</span>
+          <span class="detail-description">{{activeMarker.description}}</span>
         {{/if}}
         {{#unless activeMarker.downtimeAllowed}}
-          <span class="marker-status"><i class="fas fa-ban"></i> Downtime not available</span>
+          <span class="detail-status"><i class="fas fa-ban"></i> {{localize "DOWNTIME.Timeline.DowntimeNotAvailable"}}</span>
         {{/unless}}
         {{#if activeMarker.restrictions}}
-          <span class="marker-restrictions"><i class="fas fa-exclamation-triangle"></i> {{activeMarker.restrictions}}</span>
+          <span class="detail-restrictions"><i class="fas fa-exclamation-triangle"></i> {{activeMarker.restrictions}}</span>
         {{/if}}
       </div>
-    {{else}}
-      <div class="no-marker">
-        <span>No active marker</span>
-      </div>
-    {{/if}}
-    {{#if isGM}}
-      <button type="button" class="create-marker" title="Create new marker">
-        <i class="fas fa-plus"></i> New Marker
-      </button>
     {{/if}}
   </div>
 

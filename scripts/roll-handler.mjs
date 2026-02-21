@@ -1013,22 +1013,29 @@ function renderDicePoolChat(result, actionName) {
  * @returns {string} ROLL_TYPES constant
  */
 export function determineRollType(action, character) {
-  // If action specifies a roll type, use it
-  if (action.rollType === "dice-pool" || action.rollType === "pool") {
+  // Explicit dice pool actions always use dice pool
+  if (action.rollType === "dice-pool" || action.rollType === "pool" || action.rollType === "recovery") {
     return ROLL_TYPES.DICE_POOL;
   }
-  if (action.rollType === "pilot-check" || action.rollType === "skill") {
+
+  // Explicit pilot check (only when not overridden by character/action context)
+  if (action.rollType === "pilot-check") {
     return ROLL_TYPES.PILOT_CHECK;
   }
 
-  // Check if character has Far Field data (use dice pool)
+  // Far Field characters use dice pools for skill-type actions
   if (character?.hasFarFieldData) {
     return ROLL_TYPES.DICE_POOL;
   }
 
-  // Check action set source
+  // Far Field action set uses dice pools
   if (action.actionSetId === "far-field") {
     return ROLL_TYPES.DICE_POOL;
+  }
+
+  // "skill" rollType without Far Field context falls back to pilot check
+  if (action.rollType === "skill") {
+    return ROLL_TYPES.PILOT_CHECK;
   }
 
   // Default to pilot check for LANCER Core
@@ -1043,13 +1050,42 @@ export function determineRollType(action, character) {
  * @returns {number} Base pool size
  */
 export function getBasePoolSize(actor, action) {
-  // Try to get Far Field character data
   const ffChar = actor?.getFlag?.("Far-Field-Foundry-Module-main", "character");
+  if (!ffChar) return 2;
 
-  if (ffChar) {
-    // Could map action categories to aspects here
-    // For now, return a default of 2
-    return 2;
+  const aspects = ffChar.aspects || [];
+  if (aspects.length === 0) return 2;
+
+  // Map action categories to the aspect types most relevant to them
+  const categoryToAspectType = {
+    "development": "Expertise",
+    "social": "Expertise",
+    "rest": "Expertise",
+    "personal": "Expertise",
+    "acquisition": "Equipment",
+    "logistics": "Equipment",
+    "maintenance": "Equipment"
+  };
+
+  const preferredType = categoryToAspectType[action.category];
+
+  // Find the best matching aspect: prefer the preferred type, use highest unmarked track
+  let bestAspect = null;
+  let bestScore = -1;
+
+  for (const aspect of aspects) {
+    const available = (aspect.track || 0) - (aspect.marked || 0);
+    const typeMatch = aspect.type === preferredType ? 1 : 0;
+    const score = typeMatch * 100 + available;
+    if (score > bestScore) {
+      bestScore = score;
+      bestAspect = aspect;
+    }
+  }
+
+  if (bestAspect) {
+    // Pool size = aspect track size (total boxes), minimum 2
+    return Math.max(2, bestAspect.track || 2);
   }
 
   return 2;

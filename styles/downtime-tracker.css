@@ -26,77 +26,243 @@
   margin-right: 0.5rem;
 }
 
-/* Marker Bar */
-.marker-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
+/* Timeline Container */
+.timeline-container {
   background: #0f3460;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid #333;
 }
 
-.active-marker {
+.timeline-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
-.active-marker.downtime-disabled {
-  opacity: 0.7;
-}
-
-.marker-title {
+.timeline-label {
   font-weight: bold;
-  color: #fff;
-}
-
-.marker-title i {
-  color: #ffd700;
-  margin-right: 0.3rem;
-}
-
-.marker-description {
-  color: #aaa;
-  font-size: 0.85rem;
-}
-
-.marker-status {
   color: #e94560;
   font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.marker-status i {
-  margin-right: 0.25rem;
+.timeline-label i {
+  margin-right: 0.4rem;
 }
 
-.marker-restrictions {
-  color: #ff9800;
-  font-size: 0.85rem;
+.timeline-controls {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.marker-restrictions i {
-  margin-right: 0.25rem;
-}
-
-.no-marker {
-  color: #666;
-  font-style: italic;
-}
-
-.create-marker {
-  padding: 0.4rem 0.75rem;
+.timeline-controls button {
+  padding: 0.3rem 0.6rem;
   background: #533483;
   border: none;
   border-radius: 4px;
   color: #fff;
   cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.timeline-controls button:hover {
+  background: #6a4c9c;
+}
+
+.journal-sync-btn i {
+  margin-right: 0.25rem;
+}
+
+.create-marker i {
+  margin-right: 0.25rem;
+}
+
+/* Timeline Rail */
+.timeline-rail-wrapper {
+  overflow-x: auto;
+  padding: 0.25rem 0;
+}
+
+.timeline-rail {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 60px;
+  padding: 0 1rem;
+  gap: 0.5rem;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background: #333;
+  z-index: 0;
+}
+
+.timeline-empty {
+  color: #666;
+  font-style: italic;
+  font-size: 0.8rem;
+  z-index: 1;
+  padding: 0.5rem;
+}
+
+/* Timeline Node */
+.timeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  min-width: 70px;
+  cursor: pointer;
+  position: relative;
+  padding: 0.25rem 0.5rem;
+  transition: transform 0.15s ease;
+}
+
+.timeline-node:hover {
+  transform: scale(1.05);
+}
+
+.node-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #533483;
+  border: 2px solid #1a1a2e;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.timeline-node.active .node-dot {
+  width: 22px;
+  height: 22px;
+  background: #e94560;
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 8px rgba(233, 69, 96, 0.6), 0 0 16px rgba(255, 215, 0, 0.3);
+}
+
+.timeline-node.disabled .node-dot {
+  background: #444;
+  border-color: #666;
+}
+
+.node-label {
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  text-align: center;
+}
+
+.timeline-node.active .node-label {
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Node Action Buttons */
+.node-actions {
+  display: none;
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 0.25rem;
+  z-index: 2;
+}
+
+.timeline-node:hover .node-actions {
+  display: flex;
+}
+
+.node-actions button {
+  padding: 0.15rem 0.3rem;
+  background: #16213e;
+  border: 1px solid #533483;
+  border-radius: 3px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.node-actions button:hover {
+  background: #533483;
+  color: #fff;
+}
+
+/* Drag States */
+.timeline-node.dragging {
+  opacity: 0.4;
+}
+
+.timeline-node.drag-over-left {
+  border-left: 2px solid #ffd700;
+}
+
+.timeline-node.drag-over-right {
+  border-right: 2px solid #ffd700;
+}
+
+/* Active Marker Detail Strip */
+.active-marker-detail {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid #e94560;
+}
+
+.active-marker-detail.downtime-disabled {
+  opacity: 0.7;
+  border-left-color: #666;
+}
+
+.detail-title {
+  font-weight: bold;
+  color: #fff;
   font-size: 0.85rem;
 }
 
-.create-marker:hover {
-  background: #6a4c9c;
+.detail-title i {
+  color: #ffd700;
+  margin-right: 0.3rem;
+}
+
+.detail-description {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.detail-status {
+  color: #e94560;
+  font-size: 0.8rem;
+}
+
+.detail-status i {
+  margin-right: 0.25rem;
+}
+
+.detail-restrictions {
+  color: #ff9800;
+  font-size: 0.8rem;
+}
+
+.detail-restrictions i {
+  margin-right: 0.25rem;
 }
 
 /* Content Area - 3 Column Layout */

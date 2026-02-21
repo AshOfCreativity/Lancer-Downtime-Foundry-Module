@@ -59,6 +59,22 @@ function registerSettings() {
     type: String,
     default: null
   });
+
+  // Journal sync configuration
+  game.settings.register(MODULE_ID, SETTINGS.journalSyncConfig, {
+    name: "Journal Sync Config",
+    hint: "Configuration for syncing downtime data to a journal entry",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {
+      journalId: null,
+      includeMarkerSummaries: true,
+      includeActionHistory: true,
+      includeRollResults: true,
+      includedMarkerIds: []
+    }
+  });
 }
 
 /**
@@ -134,8 +150,9 @@ export function getActiveMarker() {
  * Add a new marker and set it as active
  */
 export async function addMarker(title, description, downtimeAllowed, restrictions) {
-  const marker = createMarker(title, description, downtimeAllowed, restrictions);
   const markers = getMarkers();
+  const maxOrder = markers.reduce((max, m) => Math.max(max, m.order ?? 0), -1);
+  const marker = createMarker(title, description, downtimeAllowed, restrictions, maxOrder + 1);
   markers.push(marker);
   await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
   await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, marker.id);
@@ -147,6 +164,67 @@ export async function addMarker(title, description, downtimeAllowed, restriction
  */
 export async function setActiveMarker(markerId) {
   await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, markerId);
+}
+
+/**
+ * Update an existing marker by ID
+ */
+export async function updateMarker(markerId, updates) {
+  const markers = getMarkers();
+  const index = markers.findIndex(m => m.id === markerId);
+  if (index === -1) return null;
+  markers[index] = foundry.utils.mergeObject(markers[index], updates, { inplace: false });
+  await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
+  return markers[index];
+}
+
+/**
+ * Delete a marker by ID
+ */
+export async function deleteMarker(markerId) {
+  let markers = getMarkers();
+  markers = markers.filter(m => m.id !== markerId);
+  await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
+  // If deleted marker was active, fall back to last marker or null
+  const activeId = game.settings.get(MODULE_ID, SETTINGS.activeMarkerId);
+  if (activeId === markerId) {
+    const fallback = markers.length > 0 ? markers[markers.length - 1].id : null;
+    await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, fallback);
+  }
+}
+
+/**
+ * Reorder markers by accepting an array of {id, order} updates
+ */
+export async function reorderMarkers(orderUpdates) {
+  const markers = getMarkers();
+  const orderMap = new Map(orderUpdates.map(u => [u.id, u.order]));
+  for (const marker of markers) {
+    if (orderMap.has(marker.id)) {
+      marker.order = orderMap.get(marker.id);
+    }
+  }
+  await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
+}
+
+/**
+ * Get journal sync configuration
+ */
+export function getJournalSyncConfig() {
+  return game.settings.get(MODULE_ID, SETTINGS.journalSyncConfig) || {
+    journalId: null,
+    includeMarkerSummaries: true,
+    includeActionHistory: true,
+    includeRollResults: true,
+    includedMarkerIds: []
+  };
+}
+
+/**
+ * Set journal sync configuration
+ */
+export async function setJournalSyncConfig(config) {
+  await game.settings.set(MODULE_ID, SETTINGS.journalSyncConfig, config);
 }
 
 /**
@@ -181,6 +259,12 @@ Hooks.once("init", () => {
     getActiveMarker,
     addMarker,
     setActiveMarker,
+    updateMarker,
+    deleteMarker,
+    reorderMarkers,
+    // Journal sync functions
+    getJournalSyncConfig,
+    setJournalSyncConfig,
     // Roll functions for external use
     roll: {
       showDialog: showRollDialog,
@@ -193,8 +277,20 @@ Hooks.once("init", () => {
   };
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
   console.log(`${MODULE_ID} | Ready`);
+
+  // Migrate markers: add order field if missing (GM only)
+  if (game.user.isGM) {
+    const markers = getMarkers();
+    const needsMigration = markers.some(m => m.order === undefined || m.order === null);
+    if (needsMigration) {
+      console.log(`${MODULE_ID} | Migrating markers to add order field`);
+      const sorted = [...markers].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      sorted.forEach((m, i) => { m.order = i; });
+      await game.settings.set(MODULE_ID, SETTINGS.markers, sorted);
+    }
+  }
 });
 
 Hooks.on("getSceneControlButtons", addSceneControlButton);

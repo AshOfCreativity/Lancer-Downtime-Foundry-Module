@@ -13,8 +13,13 @@ import {
   updateCharacterDowntimeData,
   getMarkers,
   getActiveMarker,
-  addMarker
+  addMarker,
+  setActiveMarker,
+  updateMarker,
+  deleteMarker,
+  reorderMarkers
 } from "./main.mjs";
+import { showJournalSyncDialog } from "./journal-sync.mjs";
 import {
   showRollDialog,
   postRollToChat,
@@ -106,6 +111,15 @@ export class DowntimeTrackerApp extends Application {
     context.markers = getMarkers();
     context.activeMarker = getActiveMarker();
 
+    // Timeline markers sorted by order, with isActive flag
+    const activeId = context.activeMarker?.id || null;
+    context.timelineMarkers = [...context.markers]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .map(m => ({
+        ...m,
+        isActive: m.id === activeId
+      }));
+
     return context;
   }
 
@@ -123,6 +137,21 @@ export class DowntimeTrackerApp extends Application {
 
     // Marker controls (GM only)
     html.find(".create-marker").click(this._onCreateMarker.bind(this));
+
+    // Timeline node selection
+    html.find(".timeline-node").click(this._onSelectMarker.bind(this));
+
+    // Timeline marker edit/delete (GM only)
+    html.find(".edit-marker").click(this._onEditMarker.bind(this));
+    html.find(".delete-marker").click(this._onDeleteMarker.bind(this));
+
+    // Journal sync (GM only)
+    html.find(".journal-sync-btn").click(this._onJournalSync.bind(this));
+
+    // Timeline drag-drop (GM only)
+    if (game.user.isGM) {
+      this._initTimelineDragDrop(html);
+    }
   }
 
   _onSelectCharacter(event) {
@@ -189,6 +218,174 @@ export class DowntimeTrackerApp extends Application {
       },
       default: "create"
     }).render(true);
+  }
+
+  async _onSelectMarker(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const node = event.currentTarget;
+    const markerId = node.dataset.markerId;
+    if (!markerId) return;
+    await setActiveMarker(markerId);
+    this.render(false);
+  }
+
+  async _onEditMarker(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const markerId = event.currentTarget.dataset.markerId;
+    const markers = getMarkers();
+    const marker = markers.find(m => m.id === markerId);
+    if (!marker) return;
+
+    const content = `
+      <form class="edit-marker-form">
+        <div class="form-group">
+          <label>${game.i18n.localize("DOWNTIME.Markers.TitleLabel")}:</label>
+          <input type="text" name="title" value="${marker.title}"/>
+        </div>
+        <div class="form-group">
+          <label>${game.i18n.localize("DOWNTIME.Markers.DescriptionLabel")}:</label>
+          <textarea name="description" rows="2">${marker.description || ""}</textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="downtimeAllowed" ${marker.downtimeAllowed ? "checked" : ""}/>
+            ${game.i18n.localize("DOWNTIME.Markers.DowntimeAllowed")}
+          </label>
+        </div>
+        <div class="form-group">
+          <label>${game.i18n.localize("DOWNTIME.Markers.RestrictionsLabel")}:</label>
+          <textarea name="restrictions" rows="2">${marker.restrictions || ""}</textarea>
+        </div>
+      </form>
+    `;
+
+    new Dialog({
+      title: game.i18n.localize("DOWNTIME.Markers.EditTitle"),
+      content,
+      buttons: {
+        save: {
+          icon: '<i class="fas fa-save"></i>',
+          label: game.i18n.localize("DOWNTIME.Markers.Save"),
+          callback: async (html) => {
+            const updates = {
+              title: html.find('[name="title"]').val() || marker.title,
+              description: html.find('[name="description"]').val() || "",
+              downtimeAllowed: html.find('[name="downtimeAllowed"]').is(":checked"),
+              restrictions: html.find('[name="restrictions"]').val() || ""
+            };
+            await updateMarker(markerId, updates);
+            ui.notifications.info(`${game.i18n.localize("DOWNTIME.Markers.Updated")}: ${updates.title}`);
+            this.render(false);
+          }
+        },
+        cancel: {
+          icon: '<i class="fas fa-times"></i>',
+          label: game.i18n.localize("DOWNTIME.Markers.Cancel")
+        }
+      },
+      default: "save"
+    }).render(true);
+  }
+
+  async _onDeleteMarker(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const markerId = event.currentTarget.dataset.markerId;
+    const markers = getMarkers();
+    const marker = markers.find(m => m.id === markerId);
+    if (!marker) return;
+
+    const confirmed = await Dialog.confirm({
+      title: game.i18n.localize("DOWNTIME.Markers.DeleteTitle"),
+      content: `<p>${game.i18n.localize("DOWNTIME.Markers.DeleteConfirm")} <strong>${marker.title}</strong>?</p>`
+    });
+
+    if (confirmed) {
+      await deleteMarker(markerId);
+      ui.notifications.info(`${game.i18n.localize("DOWNTIME.Markers.Deleted")}: ${marker.title}`);
+      this.render(false);
+    }
+  }
+
+  _initTimelineDragDrop(html) {
+    const nodes = html.find(".timeline-node");
+    let draggedId = null;
+
+    nodes.each((_, node) => {
+      node.addEventListener("dragstart", (e) => {
+        draggedId = node.dataset.markerId;
+        node.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedId);
+      });
+
+      node.addEventListener("dragend", () => {
+        draggedId = null;
+        node.classList.remove("dragging");
+        nodes.each((_, n) => {
+          n.classList.remove("drag-over-left", "drag-over-right");
+        });
+      });
+
+      node.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (node.dataset.markerId === draggedId) return;
+        // Determine left or right side
+        const rect = node.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        node.classList.remove("drag-over-left", "drag-over-right");
+        if (e.clientX < midX) {
+          node.classList.add("drag-over-left");
+        } else {
+          node.classList.add("drag-over-right");
+        }
+      });
+
+      node.addEventListener("dragleave", () => {
+        node.classList.remove("drag-over-left", "drag-over-right");
+      });
+
+      node.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        const droppedId = e.dataTransfer.getData("text/plain");
+        const targetId = node.dataset.markerId;
+        if (!droppedId || droppedId === targetId) return;
+
+        // Get current sorted markers
+        const markers = getMarkers().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const orderedIds = markers.map(m => m.id);
+
+        // Remove dragged from current position
+        const fromIndex = orderedIds.indexOf(droppedId);
+        if (fromIndex === -1) return;
+        orderedIds.splice(fromIndex, 1);
+
+        // Determine drop position
+        const toIndex = orderedIds.indexOf(targetId);
+        const rect = node.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const insertIndex = e.clientX < midX ? toIndex : toIndex + 1;
+        orderedIds.splice(insertIndex, 0, droppedId);
+
+        // Build order updates
+        const orderUpdates = orderedIds.map((id, i) => ({ id, order: i }));
+        await reorderMarkers(orderUpdates);
+
+        nodes.each((_, n) => {
+          n.classList.remove("dragging", "drag-over-left", "drag-over-right");
+        });
+
+        this.render(false);
+      });
+    });
+  }
+
+  async _onJournalSync(event) {
+    event.preventDefault();
+    await showJournalSyncDialog(this);
   }
 
   async _onExecuteAction(event) {

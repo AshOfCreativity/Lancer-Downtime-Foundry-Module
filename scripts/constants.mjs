@@ -8,7 +8,8 @@ export const SETTINGS = {
   customActionSets: "customActionSets",
   activeActionSets: "activeActionSets",
   markers: "markers",
-  activeMarkerId: "activeMarkerId"
+  activeMarkerId: "activeMarkerId",
+  journalSyncConfig: "journalSyncConfig"
 };
 
 export const PHASES = {
@@ -64,13 +65,14 @@ export function createHistoryEntry(sessionId, action, result, markerId = null) {
 /**
  * Create a marker entry
  */
-export function createMarker(title, description, downtimeAllowed, restrictions) {
+export function createMarker(title, description, downtimeAllowed, restrictions, order = 0) {
   return {
     id: foundry.utils.randomID(),
     title: title,
     description: description,
     downtimeAllowed: downtimeAllowed,
     restrictions: restrictions,
+    order: order,
     timestamp: new Date().toISOString()
   };
 }
