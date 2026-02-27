@@ -122,7 +122,8 @@
   min-width: 70px;
   cursor: pointer;
   position: relative;
-  padding: 0.25rem 0.5rem;
+  padding: 1.75rem 0.5rem 0.25rem 0.5rem;
+  margin-top: -1.5rem;
   transition: transform 0.15s ease;
 }
 
@@ -173,14 +174,15 @@
 .node-actions {
   display: none;
   position: absolute;
-  top: -24px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   gap: 0.25rem;
   z-index: 2;
 }
 
-.timeline-node:hover .node-actions {
+.timeline-node:hover .node-actions,
+.timeline-node.actions-visible .node-actions {
   display: flex;
 }
 
@@ -216,9 +218,8 @@
 /* Active Marker Detail Strip */
 .active-marker-detail {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.4rem;
   margin-top: 0.5rem;
   padding: 0.4rem 0.75rem;
   background: rgba(255, 255, 255, 0.05);
@@ -230,6 +231,105 @@
   opacity: 0.7;
   border-left-color: #666;
 }
+
+/* Marker Detail Row (info + assigned characters) */
+.marker-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.marker-detail-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+/* Assigned Character Portraits */
+.detail-assigned-characters {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.assigned-char-portrait {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #533483;
+}
+
+/* Marker History Row */
+.marker-history-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  padding-top: 0.3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-row-label {
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.history-row-label i {
+  margin-right: 0.2rem;
+}
+
+/* History Badge */
+.marker-history-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  border: 1px solid #333;
+  font-size: 0.7rem;
+}
+
+.marker-history-badge.triumph { border-color: #ffd700; }
+.marker-history-badge.success { border-color: #1db954; }
+.marker-history-badge.conflict { border-color: #ff9800; }
+.marker-history-badge.disaster { border-color: #e94560; }
+
+.badge-portrait {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.badge-action {
+  color: #ccc;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-result {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.65rem;
+}
+
+.marker-history-badge.triumph .badge-result { color: #ffd700; }
+.marker-history-badge.success .badge-result { color: #1db954; }
+.marker-history-badge.conflict .badge-result { color: #ff9800; }
+.marker-history-badge.disaster .badge-result { color: #e94560; }
 
 .detail-title {
   font-weight: bold;

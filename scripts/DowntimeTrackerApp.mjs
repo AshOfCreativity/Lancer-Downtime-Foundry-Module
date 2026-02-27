@@ -35,6 +35,7 @@ export class DowntimeTrackerApp extends Application {
     super(options);
     this.selectedCharacterId = null;
     this.filterCategory = null;
+    this.pinnedMarkerId = null;
   }
 
   static get defaultOptions() {
@@ -120,6 +121,23 @@ export class DowntimeTrackerApp extends Application {
         isActive: m.id === activeId
       }));
 
+    // Assigned characters for active marker
+    if (context.activeMarker) {
+      const markerCharIds = context.activeMarker.characterIds || [];
+      if (markerCharIds.length === 0) {
+        // Empty = all characters
+        context.assignedCharacters = context.characters;
+      } else {
+        context.assignedCharacters = context.characters.filter(c => markerCharIds.includes(c.id));
+      }
+
+      // Roll history for active marker
+      context.markerHistory = this._getMarkerHistory(context.activeMarker.id, context.characters);
+    } else {
+      context.assignedCharacters = [];
+      context.markerHistory = [];
+    }
+
     return context;
   }
 
@@ -140,6 +158,20 @@ export class DowntimeTrackerApp extends Application {
 
     // Timeline node selection
     html.find(".timeline-node").click(this._onSelectMarker.bind(this));
+
+    // Right-click to pin node actions visible
+    html.find(".timeline-node").on("contextmenu", this._onNodeContextMenu.bind(this));
+
+    // Click outside timeline nodes to dismiss pinned actions
+    html.on("click", (event) => {
+      if (!$(event.target).closest(".timeline-node").length) {
+        this.pinnedMarkerId = null;
+        html.find(".timeline-node.actions-visible").removeClass("actions-visible");
+      }
+    });
+
+    // Restore pinned state after re-render
+    this._applyPinnedActions(html);
 
     // Timeline marker edit/delete (GM only)
     html.find(".edit-marker").click(this._onEditMarker.bind(this));
@@ -171,6 +203,15 @@ export class DowntimeTrackerApp extends Application {
   async _onCreateMarker(event) {
     event.preventDefault();
 
+    const characters = getAvailableCharacters();
+    const characterCheckboxes = characters.map(c =>
+      `<label class="marker-char-checkbox">
+        <input type="checkbox" name="characterId" value="${c.id}" checked/>
+        <img src="${c.img}" alt="${c.name}" class="marker-char-img"/>
+        ${c.name}
+      </label>`
+    ).join("");
+
     const content = `
       <form class="create-marker-form">
         <div class="form-group">
@@ -191,7 +232,18 @@ export class DowntimeTrackerApp extends Application {
           <label>Restrictions:</label>
           <textarea name="restrictions" rows="2" placeholder="Any limitations on actions"></textarea>
         </div>
+        <div class="form-group">
+          <label>${game.i18n.localize("DOWNTIME.Markers.AssignedCharacters")}:</label>
+          <p class="hint">${game.i18n.localize("DOWNTIME.Markers.AssignedCharactersHint")}</p>
+          <div class="marker-char-list">${characterCheckboxes || '<em>No characters available</em>'}</div>
+        </div>
       </form>
+      <style>
+        .marker-char-list { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.25rem; }
+        .marker-char-checkbox { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+        .marker-char-img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        .hint { font-size: 0.8rem; color: #888; margin: 0.25rem 0; }
+      </style>
     `;
 
     new Dialog({
@@ -206,7 +258,10 @@ export class DowntimeTrackerApp extends Application {
             const description = html.find('[name="description"]').val() || "";
             const downtimeAllowed = html.find('[name="downtimeAllowed"]').is(":checked");
             const restrictions = html.find('[name="restrictions"]').val() || "";
-            await addMarker(title, description, downtimeAllowed, restrictions);
+            const checkedIds = html.find('[name="characterId"]:checked').map((_, el) => el.value).get();
+            // If all characters are checked, store empty array (= all)
+            const characterIds = checkedIds.length === characters.length ? [] : checkedIds;
+            await addMarker(title, description, downtimeAllowed, restrictions, characterIds);
             ui.notifications.info(`Marker created: ${title}`);
             this.render(false);
           }
@@ -226,8 +281,20 @@ export class DowntimeTrackerApp extends Application {
     const node = event.currentTarget;
     const markerId = node.dataset.markerId;
     if (!markerId) return;
+
+    this.pinnedMarkerId = markerId;
     await setActiveMarker(markerId);
     this.render(false);
+  }
+
+  _onNodeContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const markerId = event.currentTarget.dataset.markerId;
+
+    // Toggle: right-click again to dismiss
+    this.pinnedMarkerId = (this.pinnedMarkerId === markerId) ? null : markerId;
+    this._applyPinnedActions($(this.element));
   }
 
   async _onEditMarker(event) {
@@ -237,6 +304,20 @@ export class DowntimeTrackerApp extends Application {
     const markers = getMarkers();
     const marker = markers.find(m => m.id === markerId);
     if (!marker) return;
+
+    const characters = getAvailableCharacters();
+    const markerCharIds = marker.characterIds || [];
+    // Empty array = all characters assigned
+    const allAssigned = markerCharIds.length === 0;
+
+    const characterCheckboxes = characters.map(c => {
+      const checked = allAssigned || markerCharIds.includes(c.id) ? "checked" : "";
+      return `<label class="marker-char-checkbox">
+        <input type="checkbox" name="characterId" value="${c.id}" ${checked}/>
+        <img src="${c.img}" alt="${c.name}" class="marker-char-img"/>
+        ${c.name}
+      </label>`;
+    }).join("");
 
     const content = `
       <form class="edit-marker-form">
@@ -258,7 +339,18 @@ export class DowntimeTrackerApp extends Application {
           <label>${game.i18n.localize("DOWNTIME.Markers.RestrictionsLabel")}:</label>
           <textarea name="restrictions" rows="2">${marker.restrictions || ""}</textarea>
         </div>
+        <div class="form-group">
+          <label>${game.i18n.localize("DOWNTIME.Markers.AssignedCharacters")}:</label>
+          <p class="hint">${game.i18n.localize("DOWNTIME.Markers.AssignedCharactersHint")}</p>
+          <div class="marker-char-list">${characterCheckboxes || '<em>No characters available</em>'}</div>
+        </div>
       </form>
+      <style>
+        .marker-char-list { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.25rem; }
+        .marker-char-checkbox { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+        .marker-char-img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        .hint { font-size: 0.8rem; color: #888; margin: 0.25rem 0; }
+      </style>
     `;
 
     new Dialog({
@@ -269,11 +361,14 @@ export class DowntimeTrackerApp extends Application {
           icon: '<i class="fas fa-save"></i>',
           label: game.i18n.localize("DOWNTIME.Markers.Save"),
           callback: async (html) => {
+            const checkedIds = html.find('[name="characterId"]:checked').map((_, el) => el.value).get();
+            const characterIds = checkedIds.length === characters.length ? [] : checkedIds;
             const updates = {
               title: html.find('[name="title"]').val() || marker.title,
               description: html.find('[name="description"]').val() || "",
               downtimeAllowed: html.find('[name="downtimeAllowed"]').is(":checked"),
-              restrictions: html.find('[name="restrictions"]').val() || ""
+              restrictions: html.find('[name="restrictions"]').val() || "",
+              characterIds
             };
             await updateMarker(markerId, updates);
             ui.notifications.info(`${game.i18n.localize("DOWNTIME.Markers.Updated")}: ${updates.title}`);
@@ -306,6 +401,13 @@ export class DowntimeTrackerApp extends Application {
       await deleteMarker(markerId);
       ui.notifications.info(`${game.i18n.localize("DOWNTIME.Markers.Deleted")}: ${marker.title}`);
       this.render(false);
+    }
+  }
+
+  _applyPinnedActions(html) {
+    html.find(".timeline-node.actions-visible").removeClass("actions-visible");
+    if (this.pinnedMarkerId) {
+      html.find(`.timeline-node[data-marker-id="${this.pinnedMarkerId}"]`).addClass("actions-visible");
     }
   }
 
@@ -386,6 +488,28 @@ export class DowntimeTrackerApp extends Application {
   async _onJournalSync(event) {
     event.preventDefault();
     await showJournalSyncDialog(this);
+  }
+
+  /**
+   * Get roll history entries for a specific marker, aggregated across all characters
+   */
+  _getMarkerHistory(markerId, characters) {
+    const entries = [];
+    for (const char of characters) {
+      const history = char.downtimeData?.history || [];
+      for (const entry of history) {
+        if (entry.markerId === markerId) {
+          entries.push({
+            ...entry,
+            characterName: char.name,
+            characterImg: char.img
+          });
+        }
+      }
+    }
+    // Sort by timestamp descending (most recent first)
+    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    return entries;
   }
 
   async _onExecuteAction(event) {

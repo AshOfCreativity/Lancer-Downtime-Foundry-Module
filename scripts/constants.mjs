@@ -65,7 +65,7 @@ export function createHistoryEntry(sessionId, action, result, markerId = null) {
 /**
  * Create a marker entry
  */
-export function createMarker(title, description, downtimeAllowed, restrictions, order = 0) {
+export function createMarker(title, description, downtimeAllowed, restrictions, order = 0, characterIds = []) {
   return {
     id: foundry.utils.randomID(),
     title: title,
@@ -73,6 +73,7 @@ export function createMarker(title, description, downtimeAllowed, restrictions, 
     downtimeAllowed: downtimeAllowed,
     restrictions: restrictions,
     order: order,
+    characterIds: characterIds,
     timestamp: new Date().toISOString()
   };
 }

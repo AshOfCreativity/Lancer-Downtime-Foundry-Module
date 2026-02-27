@@ -46,15 +46,40 @@
     </div>
     {{#if activeMarker}}
       <div class="active-marker-detail {{#unless activeMarker.downtimeAllowed}}downtime-disabled{{/unless}}">
-        <span class="detail-title"><i class="fas fa-bookmark"></i> {{activeMarker.title}}</span>
-        {{#if activeMarker.description}}
-          <span class="detail-description">{{activeMarker.description}}</span>
-        {{/if}}
-        {{#unless activeMarker.downtimeAllowed}}
-          <span class="detail-status"><i class="fas fa-ban"></i> {{localize "DOWNTIME.Timeline.DowntimeNotAvailable"}}</span>
-        {{/unless}}
-        {{#if activeMarker.restrictions}}
-          <span class="detail-restrictions"><i class="fas fa-exclamation-triangle"></i> {{activeMarker.restrictions}}</span>
+        <div class="marker-detail-row">
+          <div class="marker-detail-info">
+            <span class="detail-title"><i class="fas fa-bookmark"></i> {{activeMarker.title}}</span>
+            {{#if activeMarker.description}}
+              <span class="detail-description">{{activeMarker.description}}</span>
+            {{/if}}
+            {{#unless activeMarker.downtimeAllowed}}
+              <span class="detail-status"><i class="fas fa-ban"></i> {{localize "DOWNTIME.Timeline.DowntimeNotAvailable"}}</span>
+            {{/unless}}
+            {{#if activeMarker.restrictions}}
+              <span class="detail-restrictions"><i class="fas fa-exclamation-triangle"></i> {{activeMarker.restrictions}}</span>
+            {{/if}}
+          </div>
+          {{#if assignedCharacters.length}}
+            <div class="detail-assigned-characters">
+              {{#each assignedCharacters}}
+                <img src="{{this.img}}" alt="{{this.name}}" class="assigned-char-portrait" title="{{this.name}}"/>
+              {{/each}}
+            </div>
+          {{/if}}
+        </div>
+        {{#if markerHistory.length}}
+          <div class="marker-history-row">
+            <span class="history-row-label"><i class="fas fa-history"></i> {{localize "DOWNTIME.MarkerHistory.Activity"}}</span>
+            {{#each markerHistory}}
+              <div class="marker-history-badge {{this.result.rollResult}}">
+                <img src="{{this.characterImg}}" alt="{{this.characterName}}" class="badge-portrait" title="{{this.characterName}}"/>
+                <span class="badge-action">{{this.actionName}}</span>
+                {{#if this.result.rollResult}}
+                  <span class="badge-result">{{this.result.rollResult}}</span>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
         {{/if}}
       </div>
     {{/if}}

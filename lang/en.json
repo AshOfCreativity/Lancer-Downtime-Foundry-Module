@@ -252,7 +252,12 @@
       "DowntimeAllowed": "Downtime actions allowed",
       "RestrictionsLabel": "Restrictions",
       "Updated": "Marker updated",
-      "Deleted": "Marker deleted"
+      "Deleted": "Marker deleted",
+      "AssignedCharacters": "Assigned Characters",
+      "AssignedCharactersHint": "Uncheck characters to exclude them from this downtime period. All checked = no restriction."
+    },
+    "MarkerHistory": {
+      "Activity": "Activity"
     },
     "Journal": {
       "Sync": "Journal Sync",

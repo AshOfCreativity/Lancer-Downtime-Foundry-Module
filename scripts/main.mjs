@@ -149,10 +149,10 @@ export function getActiveMarker() {
 /**
  * Add a new marker and set it as active
  */
-export async function addMarker(title, description, downtimeAllowed, restrictions) {
+export async function addMarker(title, description, downtimeAllowed, restrictions, characterIds = []) {
   const markers = getMarkers();
   const maxOrder = markers.reduce((max, m) => Math.max(max, m.order ?? 0), -1);
-  const marker = createMarker(title, description, downtimeAllowed, restrictions, maxOrder + 1);
+  const marker = createMarker(title, description, downtimeAllowed, restrictions, maxOrder + 1, characterIds);
   markers.push(marker);
   await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
   await game.settings.set(MODULE_ID, SETTINGS.activeMarkerId, marker.id);
@@ -280,15 +280,32 @@ Hooks.once("init", () => {
 Hooks.once("ready", async () => {
   console.log(`${MODULE_ID} | Ready`);
 
-  // Migrate markers: add order field if missing (GM only)
+  // Migrate markers (GM only)
   if (game.user.isGM) {
     const markers = getMarkers();
-    const needsMigration = markers.some(m => m.order === undefined || m.order === null);
-    if (needsMigration) {
+    let migrated = false;
+
+    // Migrate: add order field if missing
+    const needsOrderMigration = markers.some(m => m.order === undefined || m.order === null);
+    if (needsOrderMigration) {
       console.log(`${MODULE_ID} | Migrating markers to add order field`);
       const sorted = [...markers].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
       sorted.forEach((m, i) => { m.order = i; });
-      await game.settings.set(MODULE_ID, SETTINGS.markers, sorted);
+      migrated = true;
+    }
+
+    // Migrate: add characterIds field if missing
+    const needsCharacterIdsMigration = markers.some(m => !Array.isArray(m.characterIds));
+    if (needsCharacterIdsMigration) {
+      console.log(`${MODULE_ID} | Migrating markers to add characterIds field`);
+      markers.forEach(m => {
+        if (!Array.isArray(m.characterIds)) m.characterIds = [];
+      });
+      migrated = true;
+    }
+
+    if (migrated) {
+      await game.settings.set(MODULE_ID, SETTINGS.markers, markers);
     }
   }
 });
